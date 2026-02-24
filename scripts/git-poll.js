@@ -20,12 +20,13 @@ export async function startGitPoll() {
 
   async function poll() {
     try {
-      await run("git fetch origin");
+      await run(`git fetch origin ${BRANCH} --depth=1`);
       const sha = await run(`git rev-parse origin/${BRANCH}`);
 
       if (sha !== lastSha) {
         console.log("[git-poll] update detected");
         await run(`git reset --hard origin/${BRANCH}`);
+        await run("git clean -fd");
         lastSha = sha;
         triggerReload();
       }
